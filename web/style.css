@@ -349,15 +349,8 @@ body {
 	.statistics .box {
 		margin-bottom: 25px !important;
 	}
-	.navbar .navbar-nav .open .dropdown-menu>li>a {
-		color: #CCC !important
-	}
-	.navbar .navbar-nav .open .dropdown-menu>li>a:hover {
-		color: #FFF !important
-	}
 	.navbar .navbar-toggle{
 		border:none !important;
-		color: #EEE !important;
 		font-size: 18px !important;
 	}
 	.navbar .navbar-toggle:focus, .navbar .navbar-toggle:hover {background-color: transparent !important}

@@ -4,6 +4,8 @@
 
 'use strict'
 
+//const { stat } = require("original-fs")
+
 function $(selector) {
   return document.querySelector(selector)
 }
@@ -27,10 +29,10 @@ const showAsideBtn = $('.show-side-btn')
 const sidebar = $('.sidebar')
 const wrapper = $('#wrapper')
 
-showAsideBtn.addEventListener('click', function () {
-  $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
-  wrapper.classList.toggle('fullwidth')
-})
+//showAsideBtn.addEventListener('click', function () {
+//  $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
+//  wrapper.classList.toggle('fullwidth')
+//})
 
 if (window.innerWidth < 767) {
   sidebar.classList.add('show-sidebar');
@@ -259,3 +261,47 @@ var myChart = new Chart(chart, {
     }
   }
 })
+///////////////////////////////////////////////////////////////////////////////
+
+const userName = "Antonios Kalattas"
+const status = "UCY student"
+
+const numberOfActiveProjects = 12
+const numberOfActiveAssignments = 43;
+
+const numberOfCompletedProject = 25;
+const numberOfCompletedAssignments = 5;
+
+const grindTime = 4500;
+const chillTime = 1041;
+
+document.getElementById('UserName').innerHTML = userName;
+document.getElementById('Status').innerHTML = status;
+
+const today = new Date();
+                          // yyyy-mm-dd
+const targetDate = new Date("2024-12-31");
+const difference = Math.ceil((targetDate - today)/86400000);
+var season;
+if(today.getMonth()+1>6)
+  season = "Christmas";
+else
+  season = "Summer"
+
+document.getElementById('DaysForBreak').innerHTML = difference;
+
+document.getElementById('nextBreak').innerHTML = season;
+
+document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
+
+document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
+
+document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
+
+document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
+
+document.getElementById("grindTime").innerHTML = grindTime;
+
+document.getElementById("chillTime").innerHTML = chillTime;
+
+document.getElementById("grindScore").innerHTML = (grindTime*10.25)-(chillTime*0.427);
