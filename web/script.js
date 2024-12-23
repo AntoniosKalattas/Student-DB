@@ -7,55 +7,73 @@
 //const { stat } = require("original-fs")
 const { spawn } = require('child_process');
 
-let data = new Array(10);
-
 // Function to compile and execute the C program
-function readData() {
+async function readData() {
 
-  const compile = spawn('gcc', ['./BackEnd/readData.c', '-o', './BackEnd/readData']);         // Compile C code.
+  return new Promise((resolve, reject) => {
+    let ReadData ='';
 
-  compile.stderr.on('data',(data)=>{
-    console.error(`Compile Error: ${data}`);
-  });
+    const compile = spawn('gcc', ['./BackEnd/readData.c', '-o', './BackEnd/readData']);         // Compile C code.
 
-  compile.on('close', (code) => {
-    if (code !== 0) {
-      console.error(`Compilation failed with code ${code}`);
-      return;
-    }
-
-    console.log('C file compiled successfully.');
-                                                // input file       mode    1-> read | 0-> write
-    const execute = spawn('./BackEnd/readData', ['./BackEnd/data.txt', '1']);                 // Execute C code
-
-    let output = '';
-
-    // Capture stdout
-    execute.stdout.on('data', (data) => {
-      output += data.toString();
+    compile.stderr.on('data',(data)=>{
+      console.error(`Compile Error: ${data}`);
     });
 
-    // Capture stderr
-    execute.stderr.on('data', (data) => {
-      console.error(`Runtime Error: ${data}`);
-    });
-
-    // Handle process completion
-    execute.on('close', (code) => {
+    compile.on('close', (code) => {
       if (code !== 0) {
-        console.error(`Execution failed with code ${code}`);
+        console.error(`Compilation failed with code ${code}`);
         return;
       }
 
-      console.log('Output from C program:');
-      console.log(output);
+      console.log('C file compiled successfully.');
+                                                  // input file       mode    1-> read | 0-> write
+      const execute = spawn('./BackEnd/readData', ['./BackEnd/data.txt', '1']);                 // Execute C code
+
+      // Capture stdout
+      execute.stdout.on('data', (data) => {
+        ReadData += data.toString();
+        //console.log(data.toString());
+      });
+
+      // Capture stderr
+      execute.stderr.on('data', (data) => {
+        console.error(`Runtime Error: ${data}`);
+      });
+
+      // Handle process completion
+      execute.on('close', (code) => {
+        if (code !== 0) {
+          console.error(`Execution failed with code ${code}`);
+          return;
+        }
+
+        console.log('Output from C program:');
+        console.log(ReadData);
+        const values = catString(ReadData);
+        resolve(values);
+      });
     });
   });
 }
 
-// Call the function
-readData();
-
+function writeData(){
+  
+}
+  function catString(output){
+    let values =[];
+    let charr = '';
+    let x=0;
+    for(let i=0;i<output.length;i++){
+      if(output.charAt(i)!=='\n')
+        charr+=output.charAt(i);
+      else{
+        values[x] = charr;
+        charr = "";
+        x++;
+      }
+  }
+  return values;
+}
 
 function $(selector) {
   return document.querySelector(selector)
@@ -170,8 +188,10 @@ Chart.defaults.global.elements.point.radius = 0
 Chart.defaults.global.responsive = true
 Chart.defaults.global.maintainAspectRatio = false
 
-// The bar chart
-var myChart = new Chart(document.getElementById('myChart'), {
+
+
+// Average Sleep Time chart
+var myChart = new Chart(document.getElementById('SleepChart'), {
   type: 'bar',
   data: {
     labels: ["January", "February", "March", "April", 'May', 'June', 'August', 'September'],
@@ -313,46 +333,61 @@ var myChart = new Chart(chart, {
   }
 })
 ///////////////////////////////////////////////////////////////////////////////
+/**     File Format
+    0 :  study hours.
+    1 :  chill hours.
+    2 :  active projects.
+    3 :  active assignments.
+    4 :  completed projects.
+    5 :  completed assignments.
+    6 :  next break
+*/
 
-const userName = "Antonios Kalattas"
-const status = "UCY student"
+async function fillPage(){
+  const values = await readData();
+  console.log(values);
+  const userName = "Antonios Kalattas"
+  const status = "UCY student"
 
-const numberOfActiveProjects = 12
-const numberOfActiveAssignments = 43;
+  const StudyHours = values[0];
+  const chillHours = values[1];
 
-const numberOfCompletedProject = 25;
-const numberOfCompletedAssignments = 5;
+  const numberOfActiveProjects = values[2]
+  const numberOfActiveAssignments = values[3];
 
-const grindTime = 4500;
-const chillTime = 1041;
+  const numberOfCompletedProject = values[4];
+  const numberOfCompletedAssignments = values[5];
 
-document.getElementById('UserName').innerHTML = userName;
-document.getElementById('Status').innerHTML = status;
+  document.getElementById('UserName').innerHTML = userName;
+  document.getElementById('Status').innerHTML = status;
 
-const today = new Date();
-                          // yyyy-mm-dd
-const targetDate = new Date("2024-12-31");
-const difference = Math.ceil((targetDate - today)/86400000);
-var season;
-if(today.getMonth()+1>6)
-  season = "Christmas";
-else
-  season = "Summer"
+  // yyyy-mm-dd
+  const today = new Date();
+  const targetDate = new Date("2024-12-31");
+  if(today.getMonth()+1>6)
+  var season;
+    else
+    season = "Christmas";
 
-document.getElementById('DaysForBreak').innerHTML = difference;
+    season = "Summer"
+  const difference = Math.ceil((targetDate - today)/86400000);
+  document.getElementById('DaysForBreak').innerHTML = difference;
 
-document.getElementById('nextBreak').innerHTML = season;
+  document.getElementById('nextBreak').innerHTML = season;
 
-document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
+  document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
 
-document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
+  document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
 
-document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
+  document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
 
-document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
+  document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
 
-document.getElementById("grindTime").innerHTML = grindTime;
+  document.getElementById("grindTime").innerHTML = StudyHours;
 
-document.getElementById("chillTime").innerHTML = chillTime;
+  document.getElementById("chillTime").innerHTML = chillHours;
+  
+  document.getElementById("grindScore").innerHTML = (StudyHours*10.25)-(chillHours*0.427);
 
-document.getElementById("grindScore").innerHTML = (grindTime*10.25)-(chillTime*0.427);
+}
+fillPage();

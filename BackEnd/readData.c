@@ -3,21 +3,28 @@
 #include<string.h>
 
 void readData(char* fileName){
-    FILE *fp  = fopen(fileName, "r+");
+    FILE *fp=fopen(fileName, "r");
+    char line[100];
     if(fp==NULL){
         perror("Error: File Not Open");
         return;
     }
     int a;
-    while(fscanf(fp, "%d", &a) != EOF){
-        printf("%d\n",a);
-    }
-
+    while(fgets(line, sizeof(line),fp))
+        if(sscanf(line,"%d",&a)==1)
+            printf("%d\n",a);
+    fclose(fp);
 }
 
-void writeData(char* fileName){
-    
-
+void writeData(int argc, char **argv){    
+    FILE *fp = fopen(argv[1],"w");
+    if(fp==NULL){
+        perror("Faild to locate file");
+        return;
+    }
+    for(int i=2;i<argc-1;i++){
+        fprintf(fp, "%s\n",argv[i]);
+    }
 }
 
 int main(int argc, char* argv[]){
@@ -33,14 +40,14 @@ int main(int argc, char* argv[]){
      * 8) next break.
      */
 
-    if(argc !=3){
-        perror("Wrong number of arguments");
-        return EXIT_FAILURE;
-    }
+    //if(argc !=3){
+    //    perror("Wrong number of arguments");
+    //    return EXIT_FAILURE;
+    //}
     if(strcmp(argv[argc-1],"1")==0) 
         readData(argv[1]);
     else if(strcmp(argv[argc-1],"0")==0)
-        writeData(argv[1]);
+        writeData(argc,argv);
     else
         printf("Invalid Arguments");
 
