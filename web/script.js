@@ -5,6 +5,57 @@
 'use strict'
 
 //const { stat } = require("original-fs")
+const { spawn } = require('child_process');
+
+let data = new Array(10);
+
+// Function to compile and execute the C program
+function readData() {
+
+  const compile = spawn('gcc', ['./BackEnd/readData.c', '-o', './BackEnd/readData']);         // Compile C code.
+
+  compile.stderr.on('data',(data)=>{
+    console.error(`Compile Error: ${data}`);
+  });
+
+  compile.on('close', (code) => {
+    if (code !== 0) {
+      console.error(`Compilation failed with code ${code}`);
+      return;
+    }
+
+    console.log('C file compiled successfully.');
+                                                // input file       mode    1-> read | 0-> write
+    const execute = spawn('./BackEnd/readData', ['./BackEnd/data.txt', '1']);                 // Execute C code
+
+    let output = '';
+
+    // Capture stdout
+    execute.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+
+    // Capture stderr
+    execute.stderr.on('data', (data) => {
+      console.error(`Runtime Error: ${data}`);
+    });
+
+    // Handle process completion
+    execute.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`Execution failed with code ${code}`);
+        return;
+      }
+
+      console.log('Output from C program:');
+      console.log(output);
+    });
+  });
+}
+
+// Call the function
+readData();
+
 
 function $(selector) {
   return document.querySelector(selector)
