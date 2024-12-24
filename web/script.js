@@ -7,13 +7,14 @@
 //const { stat } = require("original-fs")
 const { spawn } = require('child_process');
 
+let values = [];
 // Function to compile and execute the C program
 async function readData() {
 
   return new Promise((resolve, reject) => {
     let ReadData ='';
 
-    const compile = spawn('gcc', ['./BackEnd/readData.c', '-o', './BackEnd/readData']);         // Compile C code.
+    const compile = spawn('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);         // Compile C code.
 
     compile.stderr.on('data',(data)=>{
       console.error(`Compile Error: ${data}`);
@@ -27,7 +28,7 @@ async function readData() {
 
       console.log('C file compiled successfully.');
                                                   // input file       mode    1-> read | 0-> write
-      const execute = spawn('./BackEnd/readData', ['./BackEnd/data.txt', '1']);                 // Execute C code
+      const execute = spawn('./BackEnd/readWriteData', ['./BackEnd/data.txt', '1']);                 // Execute C code
 
       // Capture stdout
       execute.stdout.on('data', (data) => {
@@ -56,8 +57,37 @@ async function readData() {
   });
 }
 
-function writeData(){
-  
+async function writeData(){
+  const compile = spawn('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);         // Compile C code.
+
+  return new Promise((resolve, reject) => {
+    compile.stderr.on('data',(data)=>{
+      console.error(`Compile Error: ${data}`);
+    });
+    compile.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`Compilation failed with code ${code}`);
+        return;
+      }
+
+      console.log('C file compiled successfully.');
+                                                  // input file       mode    1-> read | 0-> write
+      const execute = spawn('./BackEnd/readWriteData', ['./BackEnd/data1.txt',values[0], values[1], values[2], values[3], values[4],values[5],'0']);                 // Execute C code
+
+      // Capture stderr
+      execute.stderr.on('data', (data) => {
+        console.error(`Runtime Error: ${data}`);
+      });
+
+      // Handle process completion
+      execute.on('close', (code) => {
+        if (code !== 0) {
+          console.error(`Execution failed with code ${code}`);
+          return;
+        }
+      });
+    });
+  });
 }
   function catString(output){
     let values =[];
@@ -229,8 +259,8 @@ var myChart = new Chart(document.getElementById('SleepChart'), {
   }
 })
 
-// The line chart
-var chart = new Chart(document.getElementById('myChart2'), {
+//GradePerformance chart
+var chart = new Chart(document.getElementById('GradePerformance'), {
   type: 'line',
   data: {
     labels: ["January", "February", "March", "April", 'May', 'June', 'August', 'September'],
@@ -332,6 +362,8 @@ var myChart = new Chart(chart, {
     }
   }
 })
+
+
 ///////////////////////////////////////////////////////////////////////////////
 /**     File Format
     0 :  study hours.
@@ -344,7 +376,7 @@ var myChart = new Chart(chart, {
 */
 
 async function fillPage(){
-  const values = await readData();
+  values = await readData();
   console.log(values);
   const userName = "Antonios Kalattas"
   const status = "UCY student"

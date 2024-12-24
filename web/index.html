@@ -4,6 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Student Dashboard</title>
+  <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css'>
 <link rel='stylesheet' href='https://unicons.iconscout.com/release/v3.0.6/css/line.css'><link rel="stylesheet" href="./style.css">
 
@@ -35,18 +39,17 @@
     <li class="has-dropdown">
       <i class="bi bi-lungs fa-fw"></i><a href="#"> Health</a>
       <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#"> Sleep </a></li>                                                                                    <!-- Sleep stats -->
+        <li><a href="#" id="sleepHoursBtn"> Sleep </a></li>                                                                                    <!-- Sleep stats -->
       </ul>
     </li>
 
     <li class="has-dropdown">
       <i class="bi bi-bullseye fa-fw"></i><a href="#"> Grind</a>
       <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#"> Study Hours </a></li>                                                                              <!-- Study Hours -->
-        <li><a href="#"> Break Hours </a></li>                                                                              <!-- Break Hours -->
+        <li><a href="#" id="studyHoursBtn"> Study Hours </a></li>                                                                              <!-- Study Hours -->
+        <li><a href="#" id="breakHoursBtn"> Break Hours </a></li>                                                                              <!-- Break Hours -->
       </ul>
     </li>
-
     <li class="">
       <i class="uil-folder"></i><a href="#"> Goals </a>                                                                     <!-- Goals -->
     </li>
@@ -193,7 +196,33 @@
           </div>
         </div>
         </div>
+            <!-- Bootstrap Modal -->
+<div class="modal fade" id="numberInputModal" tabindex="-1" aria-labelledby="numberInputModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="numberInputModalLabel">Enter a Number</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="numberInput" class="form-label">Number:</label>
+          <input type="number" id="numberInput" class="form-control" placeholder="Enter a number">
+          <small id="errorMessage" class="text-danger mt-2"></small>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="submitNumber" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
         <div class="row">
           <div class="col-lg-12 mt-4">
             <div class="box d-flex justify-content-center align-items-center rounded-2 p-3">
@@ -248,7 +277,7 @@
         <div class="col-lg-6">
           <div class="chart-container rounded-2 p-3">
             <h3 class="fs-6 mb-3">Grade performance</h3>
-            <canvas id="myChart2"></canvas>
+            <canvas id="GradePerformance"></canvas>
           </div>
         </div>
       </div>
@@ -389,7 +418,9 @@
 </section>
 <!-- partial -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.jshttps://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script><script  src="./script.js" defer></script>
-
+<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.jshttps://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js'></script>
+<script  src="./script.js" defer></script>  <!-- Main script -->
+<script  src="./popup.js" defer></script>   <!-- Popup animation handler -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
