@@ -2,7 +2,6 @@
 The next big think
 
 # Basic Idea
-
 Create a dashboard for student.
 
 ***
