@@ -1,93 +1,56 @@
-// Other important pens.
-// Map: https://codepen.io/themustafaomar/pen/ZEGJeZq
-// Navbar: https://codepen.io/themustafaomar/pen/VKbQyZ
-
-'use strict'
-
-//const { stat } = require("original-fs")
 const { spawn } = require('child_process');
 
-let values = [];
-// Function to compile and execute the C program
-async function readData() {
+let UserData = {};  
 
+var sleepChart;
+
+async function runProcess(executable, args) {
   return new Promise((resolve, reject) => {
-    let ReadData ='';
+    let output = '';
 
-    const compile = spawn('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);         // Compile C code.
+    const process = spawn(executable, args);
 
-    compile.stderr.on('data',(data)=>{
-      console.error(`Compile Error: ${data}`);
+    // Capture stdout
+    process.stdout.on('data', (data) => {
+      
+      output += data.toString();
+      console.log(output);
     });
 
-    compile.on('close', (code) => {
+    // Capture stderr
+    process.stderr.on('data', (data) => {
+      console.error(`Error: ${data}`);
+    });
+
+    // Handle process completion
+    process.on('close', (code) => {
       if (code !== 0) {
-        console.error(`Compilation failed with code ${code}`);
-        return;
+        reject(`Process failed with exit code ${code}`);
+      } else {
+        resolve(output); // Resolve with the output
       }
-
-      console.log('C file compiled successfully.');
-                                                  // input file       mode    1-> read | 0-> write
-      const execute = spawn('./BackEnd/readWriteData', ['./BackEnd/data.txt', '1']);                 // Execute C code
-
-      // Capture stdout
-      execute.stdout.on('data', (data) => {
-        ReadData += data.toString();
-        //console.log(data.toString());
-      });
-
-      // Capture stderr
-      execute.stderr.on('data', (data) => {
-        console.error(`Runtime Error: ${data}`);
-      });
-
-      // Handle process completion
-      execute.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Execution failed with code ${code}`);
-          return;
-        }
-
-        console.log('Output from C program:');
-        console.log(ReadData);
-        const values = catString(ReadData);
-        resolve(values);
-      });
     });
   });
+
+}
+// Function to compile and execute the C program
+async function readData(option) {
+    await runProcess('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);                    // Compile C code.
+    if(option==2 || option ==3)
+      UserData.generalData= catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/data.txt', '1']));  // Execute C code
+
+      // Read Sleep.
+    if(option ==1 || option ==2)
+      UserData.sleepData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', 'rSleep']));                 // Execute C code
+    return UserData;
 }
 
 async function writeData(){
-  const compile = spawn('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);         // Compile C code.
+  await runProcess('./BackEnd/readWriteData', ['./BackEnd/data1.txt',UserData.generalData[0], UserData.generalData[1], UserData.generalData[2], UserData.generalData[3], UserData.generalData[4],UserData.generalData[5],'0']);                 // Execute C code  
+}
 
-  return new Promise((resolve, reject) => {
-    compile.stderr.on('data',(data)=>{
-      console.error(`Compile Error: ${data}`);
-    });
-    compile.on('close', (code) => {
-      if (code !== 0) {
-        console.error(`Compilation failed with code ${code}`);
-        return;
-      }
-
-      console.log('C file compiled successfully.');
-                                                  // input file       mode    1-> read | 0-> write
-      const execute = spawn('./BackEnd/readWriteData', ['./BackEnd/data1.txt',values[0], values[1], values[2], values[3], values[4],values[5],'0']);                 // Execute C code
-
-      // Capture stderr
-      execute.stderr.on('data', (data) => {
-        console.error(`Runtime Error: ${data}`);
-      });
-
-      // Handle process completion
-      execute.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Execution failed with code ${code}`);
-          return;
-        }
-      });
-    });
-  });
+async function writeSleep(sleepHours){
+  await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', sleepHours, "wSleep"]);
 }
   function catString(output){
     let values =[];
@@ -220,44 +183,7 @@ Chart.defaults.global.maintainAspectRatio = false
 
 
 
-// Average Sleep Time chart
-var myChart = new Chart(document.getElementById('SleepChart'), {
-  type: 'bar',
-  data: {
-    labels: ["January", "February", "March", "April", 'May', 'June', 'August', 'September'],
-    datasets: [{
-      label: "Lost",
-      data: [45, 25, 40, 20, 60, 20, 35, 25],
-      backgroundColor: "#0d6efd",
-      borderColor: 'transparent',
-      borderWidth: 2.5,
-      barPercentage: 0.4,
-    }, {
-      label: "Succes",
-      startAngle: 2,
-      data: [20, 40, 20, 50, 25, 40, 25, 10],
-      backgroundColor: "#dc3545",
-      borderColor: 'transparent',
-      borderWidth: 2.5,
-      barPercentage: 0.4,
-    }]
-  },
-  options: {
-    scales: {
-      yAxes: [{
-        gridLines: {},
-        ticks: {
-          stepSize: 15,
-        },
-      }],
-      xAxes: [{
-        gridLines: {
-          display: false,
-        }
-      }]
-    }
-  }
-})
+
 
 //GradePerformance chart
 var chart = new Chart(document.getElementById('GradePerformance'), {
@@ -306,11 +232,11 @@ var chart = new Chart(document.getElementById('GradePerformance'), {
   }
 })
 
-var chart = document.getElementById('chart3');
-var myChart = new Chart(chart, {
+var grindChart = document.getElementById('grindChart');
+var myChart = new Chart(grindChart, {
   type: 'line',
   data: {
-    labels: ["One", "Two", "Three", "Four", "Five", 'Six', "Seven", "Eight"],
+    labels: ["January", "February", "March", "April", 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     datasets: [{
       label: "Lost",
       lineTension: 0.2,
@@ -326,23 +252,21 @@ var myChart = new Chart(chart, {
       borderWidth: 1.5,
       data: [6, 20, 5, 20, 5, 25, 9, 18, 20, 15],
       backgroundColor: 'transparent'
-    },
-               {
-                 label: "Lost",
-                 lineTension: 0.2,
-                 borderColor: '#f0ad4e',
-                 borderWidth: 1.5,
-                 data: [12, 20, 15, 20, 5, 35, 10, 15, 35, 25],
-                 backgroundColor: 'transparent'
-               },
-               {
-                 label: "Lost",
-                 lineTension: 0.2,
-                 borderColor: '#337ab7',
-                 borderWidth: 1.5,
-                 data: [16, 25, 10, 25, 10, 30, 14, 23, 14, 29],
-                 backgroundColor: 'transparent'
-               }]
+    },{
+      label: "Lost",
+      lineTension: 0.2,
+      borderColor: '#f0ad4e',
+      borderWidth: 1.5,
+      data: [12, 20, 15, 20, 5, 35, 10, 15, 35, 25],
+      backgroundColor: 'transparent'
+    },{
+      label: "Lost",
+      lineTension: 0.2,
+      borderColor: '#337ab7',
+      borderWidth: 1.5,
+      data: [16, 25, 10, 25, 10, 30, 14, 23, 14, 29],
+      backgroundColor: 'transparent'
+    }]
   },
   options: {
     scales: {
@@ -375,20 +299,111 @@ var myChart = new Chart(chart, {
     6 :  next break
 */
 
-async function fillPage(){
-  values = await readData();
-  console.log(values);
+async function fillPageFirstTime(){
+  UserData = await readData(2);
   const userName = "Antonios Kalattas"
   const status = "UCY student"
 
-  const StudyHours = values[0];
-  const chillHours = values[1];
+  const StudyHours = UserData.generalData[0];
+  const chillHours = UserData.generalData[1];
 
-  const numberOfActiveProjects = values[2]
-  const numberOfActiveAssignments = values[3];
+  const numberOfActiveProjects = UserData.generalData[2];
+  const numberOfActiveAssignments = UserData.generalData[3];
 
-  const numberOfCompletedProject = values[4];
-  const numberOfCompletedAssignments = values[5];
+  const numberOfCompletedProject = UserData.generalData[4];
+  const numberOfCompletedAssignments = UserData.generalData[5];
+
+  document.getElementById('UserName').innerHTML = userName;
+  document.getElementById('Status').innerHTML = status;
+
+  // yyyy-mm-dd
+  const today = new Date();
+  const targetDate = new Date("2024-12-31");
+  if(today.getMonth()+1>6)  // turn month into 1 base.
+  var season;
+    else
+    season = "Christmas";
+
+    season = "Summer"
+  const difference = Math.ceil((targetDate - today)/86400000);
+  document.getElementById('DaysForBreak').innerHTML = difference;
+
+  document.getElementById('nextBreak').innerHTML = season;
+
+  document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
+
+  document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
+
+  document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
+
+  document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
+
+  document.getElementById("grindTime").innerHTML = StudyHours;
+
+  document.getElementById("chillTime").innerHTML = chillHours;
+  
+  document.getElementById("grindScore").innerHTML = (StudyHours*10.25)-(chillHours*0.427);
+
+
+      /// Sleep Chart//
+    sleepChart = new Chart(document.getElementById('SleepChart'), {
+    type: 'bar',
+    data: {
+      labels: ["January", "February", "March", "April", 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      datasets: [{
+        label: "AvgSleep",
+        data: [UserData.sleepData[0], UserData.sleepData[1], UserData.sleepData[2], UserData.sleepData[3], UserData.sleepData[4], UserData.sleepData[5], UserData.sleepData[6], UserData.sleepData[7], UserData.sleepData[8], UserData.sleepData[9], UserData.sleepData[10], UserData.sleepData[11]],
+        backgroundColor: [
+          UserData.sleepData[0] < 8 ? "red" : "green", // Conditional check
+          UserData.sleepData[1] < 8 ? "red" : "green",
+          UserData.sleepData[2] < 8 ? "red" : "green",
+          UserData.sleepData[3] < 8 ? "red" : "green",
+          UserData.sleepData[4] < 8 ? "red" : "green",
+          UserData.sleepData[5] < 8 ? "red" : "green",
+          UserData.sleepData[6] < 8 ? "red" : "green",
+          UserData.sleepData[7] < 8 ? "red" : "green",
+          UserData.sleepData[8] < 8 ? "red" : "green",
+          UserData.sleepData[9] < 8 ? "red" : "green",
+          UserData.sleepData[10] < 8 ? "red" : "green",
+          UserData.sleepData[11] < 8 ? "red" : "green"
+        ],
+        borderColor: 'transparent',
+        borderWidth: 2.5,
+        barPercentage: 0.4,
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          gridLines: {},
+          ticks: {
+            stepSize: 2,
+          },
+        }],
+        xAxes: [{
+          gridLines: {
+            display: false,
+          }
+        }]
+      }
+    }
+  })  
+}
+fillPageFirstTime();
+
+async function refreshPage(){
+  UserData = await readData(1);
+  const userName = "Antonios Kalattas"
+  const status = "UCY student"
+
+  const StudyHours = UserData.generalData[0];
+  const chillHours = UserData.generalData[1];
+
+  const numberOfActiveProjects = UserData.generalData[2];
+  const numberOfActiveAssignments = UserData.generalData[3];
+
+  const numberOfCompletedProject = UserData.generalData[4];
+  const numberOfCompletedAssignments = UserData.generalData[5];
 
   document.getElementById('UserName').innerHTML = userName;
   document.getElementById('Status').innerHTML = status;
@@ -419,7 +434,9 @@ async function fillPage(){
 
   document.getElementById("chillTime").innerHTML = chillHours;
   
-  document.getElementById("grindScore").innerHTML = (StudyHours*10.25)-(chillHours*0.427);
+  document.getElementById("grindScore").innerHTML = ((StudyHours*10.25)-(chillHours*0.427)).toFixed(2);
 
+  sleepChart.data.datasets[0].data = UserData.sleepData;
+
+  sleepChart.update();
 }
-fillPage();

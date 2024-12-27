@@ -31,7 +31,7 @@ sleepHoursBtn.addEventListener('click', () =>{
 });
 
 // Handle submit button click
-submitNumber.addEventListener('click', () => {
+submitNumber.addEventListener('click', async () => {
   const number = numberInput.value;
 
   // Validate input
@@ -42,18 +42,26 @@ submitNumber.addEventListener('click', () => {
     // Perform different actions based on the button clicked
     if(currentAction === 'studyHours'){
       alert(`Study Hours Entered: ${number}`); 
+      UserData.generalData[0] =Number(UserData.generalData[0]);
+      UserData.generalData[0]+=Number(number);
+      console.log(UserData.generalData[0]);
+      await writeData();
     }
     else if (currentAction === 'breakHours'){
       alert(`Break Hours Entered: ${number}`); 
+      UserData.generalData[1] = Number(UserData.generalData[1]);
+      UserData.generalData[1]+=Number(number);
+      await writeData();
     }
     else if(currentAction ==='sleepHours'){
         alert(`Sleep Hours Entered: ${number}`); 
-
+        await writeSleep(number);   
     }
 
     // Close modal and clear inputs
     numberInputModal.hide();
     errorMessage.textContent = '';
     numberInput.value = '';
+    await refreshPage();
   }
 });
