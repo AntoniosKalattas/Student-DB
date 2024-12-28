@@ -12,7 +12,7 @@ void readData(char* fileName){
     FILE *fp=fopen(fileName, "r");
     char line[100];
     if(fp==NULL){
-        perror("Error: File Not Open");
+        printf("Error: File Not Open");
         return;
     }
     int a;
@@ -25,7 +25,7 @@ void readData(char* fileName){
 void writeData(int argc, char **argv){    
     FILE *fp = fopen(argv[1],"w");
     if(fp==NULL){
-        perror("Faild to locate file");
+        printf("Faild to locate file");
         return;
     }
     for(int i=2;i<argc-1;i++)
@@ -43,18 +43,18 @@ void readAvgData(int argc, char **argv){
     float avg[12]={0};
     FILE *fp = fopen(argv[1],"r");
     if(fp==NULL){
-        perror("Faild to locate file");
+        printf("Faild to locate file");
         return;
     }
     char line[100];             //sotre the input line;
-    int value = 0;              // used to calculate the avg. Total Value.
+    float value = 0;              // used to calculate the avg. Total Value.
     int month = -1;             // used to store each monnth. 0 based.
     int x=1;                    // used to calculate the avg. Number of values.
 
     while(fgets(line, sizeof(line),fp)){
-        int value_t;
+        float value_t;
         int month_t;
-        if(sscanf(line,"%d - %d",&value_t, &month_t)==2){
+        if(sscanf(line,"%f - %d",&value_t, &month_t)==2){
             if(month ==-1){             // handle the first ever iteration.
                 value = value_t;        // set the value to the firt read value.
                 month = month_t;        // set the month to the first read month.
@@ -90,10 +90,10 @@ void writeAvgData(char **argv){
     int month = tm_info->tm_mon;                // current month.
     FILE *fp = fopen(argv[1], "a");
     if(fp==NULL){
-        perror("Faild to locate file");
+        printf("Faild to locate file");
         return;
     }
-    fprintf(fp,"%s - %d\n" ,argv[2], month);    // will store the value from the arguments.
+    fprintf(fp,"\n%s - %d" ,argv[2], month);    // will store the value from the arguments.
     fclose(fp);
 }
 
@@ -114,19 +114,23 @@ int main(int argc, char* argv[]){
     //    perror("Wrong number of arguments");
     //    return EXIT_FAILURE;
     //}
-    if(strcmp(argv[argc-1],"0")==0)                 // wrtie grind chill etc.
+    if(strcmp(argv[argc-1],"0")==0)                     // wrtie grind chill etc.
         writeData(argc,argv);   
-    else if(strcmp(argv[argc-1],"1")==0)            // read grind, chill etc.
+    else if(strcmp(argv[argc-1],"1")==0)                // read grind, chill etc.
         readData(argv[1]);
 
 
-    else if(strcmp(argv[argc-1],"rSleep")==0){            // read sleep data
+    else if(strcmp(argv[argc-1],"rSleep")==0){          // read sleep data
         printf("rSleep");
         readAvgData(argc,argv);
     }
-    else if(strcmp(argv[argc-1],"wSleep")==0)            // write sleep.
+    else if(strcmp(argv[argc-1],"wSleep")==0)           // write sleep.
         writeAvgData(argv);
 
+    else if(strcmp(argv[argc-1],"rGrades")==0)           // read grades.
+        readAvgData(argc,argv);
+    else if(strcmp(argv[argc-1],"wGrade")==0)           // write grade.
+        writeAvgData(argv);
     else
         printf("Invalid Arguments");
 

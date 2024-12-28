@@ -55,7 +55,7 @@
     </li>
 
     <li class="">
-      <i class="bi bi-plus-circle"></i><a href="#"> Add Grades </a>                                                         <!-- Add Grade -->
+      <i class="bi bi-plus-circle"></i><a href="#" id="addGradesBtn"> Add Grades </a>                                                         <!-- Add Grade -->
     </li>
     <li class="">
       <i class="bi bi-file-earmark-arrow-up"></i><a href="#"> Add Assignment </a>                                                         <!-- Add Assignment -->
@@ -63,82 +63,29 @@
     <li class="">
       <i class="bi bi-clipboard-plus  "></i><a href="#"> Add Project </a>                                                         <!-- Add Project -->
     </li>
-                      <!--
-    <li class="has-dropdown">
-      <i class="uil-calendar-alt"></i><a href="#"> Calender</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <i class="uil-envelope-download fa-fw"></i><a href="#"> Mailbox</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <i class="uil-shopping-cart-alt"></i><a href="#"> Ecommerce</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <i class="uil-bag"></i><a href="#"> Projects</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="">
-      <i class="uil-setting"></i><a href="#"> Settings</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <i class="uil-chart-pie-alt"></i><a href="#"> Components</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="has-dropdown">
-      <i class="uil-panel-add"></i><a href="#"> Charts</a>
-      <ul class="sidebar-dropdown list-unstyled">
-        <li><a href="#">Lorem ipsum</a></li>
-        <li><a href="#">ipsum dolor</a></li>
-        <li><a href="#">dolor ipsum</a></li>
-        <li><a href="#">amet consectetur</a></li>
-        <li><a href="#">ipsum dolor sit</a></li>
-      </ul>
-    </li>
-    <li class="">
-      <i class="uil-map-marker"></i><a href="#"> Maps</a>
-    </li>
-  </ul>
-                      -->
+    
+      <a class="d-flex flex-column align-items-center list-unstyled">
+        <li class="mb-4">
+            <!-- Study Button -->
+            <button class="btn btn-success" type="button" id="startStudy">
+                <i class="bi bi-stopwatch"></i> 
+                <span class="label">Study</span>
+                <span class="time">00:00:00</span>
+            </button>
+        </li>
+        <li class="">
+            <!-- Break Button -->
+            <button class="btn btn-danger" type="button" id="startBreak">
+                <i class="bi bi-stopwatch"></i> 
+                <span class="label">Break</span>
+                <span class="time">00:00:00</span>
+            </button>
+        </li>
+      </a>
+  
+  
+                      
+  
 </aside>
 <section id="wrapper">
   <nav class="navbar navbar-expand-md bg-secondary navbar-dark">

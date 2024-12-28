@@ -2,7 +2,8 @@ const { spawn } = require('child_process');
 
 let UserData = {};  
 
-var sleepChart;
+let sleepChart;
+let gradesChart;
 
 async function runProcess(executable, args) {
   return new Promise((resolve, reject) => {
@@ -42,6 +43,8 @@ async function readData(option) {
       // Read Sleep.
     if(option ==1 || option ==2)
       UserData.sleepData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', 'rSleep']));                 // Execute C code
+    if(option ==3 || option ==2)
+        UserData.grades = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/gradesData.txt', 'rGrades']));        
     return UserData;
 }
 
@@ -52,7 +55,7 @@ async function writeData(){
 async function writeSleep(sleepHours){
   await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', sleepHours, "wSleep"]);
 }
-  function catString(output){
+function catString(output){
     let values =[];
     let charr = '';
     let x=0;
@@ -66,6 +69,10 @@ async function writeSleep(sleepHours){
       }
   }
   return values;
+}
+
+async function writeGrade(grade){
+  await runProcess('./BackEnd/readWriteData', ['./BackEnd/gradesData.txt', grade, "wGrade"]);
 }
 
 function $(selector) {
@@ -185,52 +192,6 @@ Chart.defaults.global.maintainAspectRatio = false
 
 
 
-//GradePerformance chart
-var chart = new Chart(document.getElementById('GradePerformance'), {
-  type: 'line',
-  data: {
-    labels: ["January", "February", "March", "April", 'May', 'June', 'August', 'September'],
-    datasets: [{
-      label: "My First dataset",
-      data: [4, 20, 5, 20, 5, 25, 9, 18],
-      backgroundColor: 'transparent',
-      borderColor: '#0d6efd',
-      lineTension: .4,
-      borderWidth: 1.5,
-    }, {
-      label: "Month",
-      data: [11, 25, 10, 25, 10, 30, 14, 23],
-      backgroundColor: 'transparent',
-      borderColor: '#dc3545',
-      lineTension: .4,
-      borderWidth: 1.5,
-    }, {
-      label: "Month",
-      data: [16, 30, 16, 30, 16, 36, 21, 35],
-      backgroundColor: 'transparent',
-      borderColor: '#f0ad4e',
-      lineTension: .4,
-      borderWidth: 1.5,
-    }]
-  },
-  options: {
-    scales: {
-      yAxes: [{
-        gridLines: {
-          drawBorder: false
-        },
-        ticks: {
-          stepSize: 12,
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          display: false,
-        },
-      }]
-    }
-  }
-})
 
 var grindChart = document.getElementById('grindChart');
 var myChart = new Chart(grindChart, {
@@ -299,74 +260,78 @@ var myChart = new Chart(grindChart, {
     6 :  next break
 */
 
-async function fillPageFirstTime(){
-  UserData = await readData(2);
-  const userName = "Antonios Kalattas"
-  const status = "UCY student"
+// Reusable function to update DOM elements
+function updateElement(id, value) {
+  document.getElementById(id).innerHTML = value;
+}
 
-  const StudyHours = UserData.generalData[0];
-  const chillHours = UserData.generalData[1];
-
-  const numberOfActiveProjects = UserData.generalData[2];
-  const numberOfActiveAssignments = UserData.generalData[3];
-
-  const numberOfCompletedProject = UserData.generalData[4];
-  const numberOfCompletedAssignments = UserData.generalData[5];
-
-  document.getElementById('UserName').innerHTML = userName;
-  document.getElementById('Status').innerHTML = status;
-
-  // yyyy-mm-dd
+// Function to calculate days until target date
+function calculateDaysUntil(targetDate) {
   const today = new Date();
-  const targetDate = new Date("2024-12-31");
-  if(today.getMonth()+1>6)  // turn month into 1 base.
-  var season;
-    else
-    season = "Christmas";
+  return Math.ceil((targetDate - today) / 86400000); // Milliseconds to days
+}
 
-    season = "Summer"
-  const difference = Math.ceil((targetDate - today)/86400000);
-  document.getElementById('DaysForBreak').innerHTML = difference;
+// Function to determine the season
+function getSeason() {
+  const month = new Date().getMonth() + 1; // 1-based month
+  return month > 6 ? "Summer" : "Christmas";
+}
 
-  document.getElementById('nextBreak').innerHTML = season;
+// Function to calculate grind score
+function calculateGrindScore(studyHours, chillHours) {
+  return ((studyHours * 10.25) - (chillHours * 0.427)).toFixed(2);
+}
 
-  document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
+// Function to create grades Chart.
+function createGradesChart(data){
+  return new Chart(document.getElementById('GradePerformance'), {
+    type: 'line',
+    data: {
+      labels: ["January", "February", "March", "April", 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December'],
+      datasets: [{
+        label: "AvgGrades",
+        data: data,
+        backgroundColor: 'transparent',
+        borderColor: '#0d6efd',
+        lineTension: .4,
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false
+          },
+          ticks: {
+            stepSize: 25,
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            display: false,
+          },
+        }]
+      }
+    }
+  })
+}
 
-  document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
 
-  document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
-
-  document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
-
-  document.getElementById("grindTime").innerHTML = StudyHours;
-
-  document.getElementById("chillTime").innerHTML = chillHours;
-  
-  document.getElementById("grindScore").innerHTML = (StudyHours*10.25)-(chillHours*0.427);
-
-
-      /// Sleep Chart//
-    sleepChart = new Chart(document.getElementById('SleepChart'), {
+// Function to create sleep chart
+function createSleepChart(data) {
+  return new Chart(document.getElementById('SleepChart'), {
     type: 'bar',
     data: {
-      labels: ["January", "February", "March", "April", 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      labels: [
+        "January", "February", "March", "April", 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ],
       datasets: [{
         label: "AvgSleep",
-        data: [UserData.sleepData[0], UserData.sleepData[1], UserData.sleepData[2], UserData.sleepData[3], UserData.sleepData[4], UserData.sleepData[5], UserData.sleepData[6], UserData.sleepData[7], UserData.sleepData[8], UserData.sleepData[9], UserData.sleepData[10], UserData.sleepData[11]],
-        backgroundColor: [
-          UserData.sleepData[0] < 8 ? "red" : "green", // Conditional check
-          UserData.sleepData[1] < 8 ? "red" : "green",
-          UserData.sleepData[2] < 8 ? "red" : "green",
-          UserData.sleepData[3] < 8 ? "red" : "green",
-          UserData.sleepData[4] < 8 ? "red" : "green",
-          UserData.sleepData[5] < 8 ? "red" : "green",
-          UserData.sleepData[6] < 8 ? "red" : "green",
-          UserData.sleepData[7] < 8 ? "red" : "green",
-          UserData.sleepData[8] < 8 ? "red" : "green",
-          UserData.sleepData[9] < 8 ? "red" : "green",
-          UserData.sleepData[10] < 8 ? "red" : "green",
-          UserData.sleepData[11] < 8 ? "red" : "green"
-        ],
+        data: data,
+        backgroundColor: data.map(value => value < 8 ? "red" : "green"),
         borderColor: 'transparent',
         borderWidth: 2.5,
         barPercentage: 0.4,
@@ -375,68 +340,162 @@ async function fillPageFirstTime(){
     options: {
       scales: {
         yAxes: [{
-          gridLines: {},
-          ticks: {
-            stepSize: 2,
-          },
+          ticks: { stepSize: 2 },
         }],
         xAxes: [{
-          gridLines: {
-            display: false,
-          }
+          gridLines: { display: false }
         }]
       }
     }
-  })  
+  });
 }
+
+// Common function to populate the page
+async function populatePage(userData) {
+  const userName = "Antonios Kalattas";
+  const status = "UCY student";
+
+  const generalData = userData.generalData;
+  const studyHours = generalData[0];
+  const chillHours = generalData[1];
+
+  const targetDate = new Date("2024-12-31");
+  const daysForBreak = calculateDaysUntil(targetDate);
+  const season = getSeason();
+
+  // Update general information
+  updateElement('UserName', userName);
+  updateElement('Status', status);
+  updateElement('DaysForBreak', daysForBreak);
+  updateElement('nextBreak', season);
+
+  // Update project and assignment data
+  updateElement('activeProjects', generalData[2]);
+  updateElement('numberOfAssignments', generalData[3]);
+  updateElement('completedProjects', generalData[4]);
+  updateElement('completedAssignments', generalData[5]);
+
+  // Update grind data
+  updateElement("grindTime", studyHours);
+  updateElement("chillTime", chillHours);
+  updateElement("grindScore", calculateGrindScore(studyHours, chillHours));
+
+  return userData.sleepData;
+}
+
+// Fill page the first time
+async function fillPageFirstTime() {
+  const userData = await readData(2);
+  const sleepData = await populatePage(userData);
+
+  // Create the sleep chart
+  sleepChart = createSleepChart(sleepData);
+  gradesChart = createGradesChart(UserData.grades);
+}
+
+// Refresh the page with updated data
+async function refreshPage() {
+  const userData = await readData(2);
+  const sleepData = await populatePage(userData);
+
+
+  // Update the sleep chart
+  sleepChart.data.datasets[0].data = sleepData;
+  sleepChart.data.datasets[0].backgroundColor = sleepData.map(value => value < 8 ? "red" : "green");
+  sleepChart.update();
+  // Update teh grades Chart.
+  console.log(UserData.grades);
+  gradesChart.data.datasets[0].data = UserData.grades.map(Number); // Ensure grades are numeric
+  gradesChart.update(); // Refresh the chart
+}
+
+// Initialize the page
 fillPageFirstTime();
 
-async function refreshPage(){
-  UserData = await readData(1);
-  const userName = "Antonios Kalattas"
-  const status = "UCY student"
 
-  const StudyHours = UserData.generalData[0];
-  const chillHours = UserData.generalData[1];
+// Timer Variables
+let timer;
+let startTime;
+let elapsedTime = 0; // Tracks elapsed time in milliseconds
+let isRunning = false; // State to track if the timer is running
+let activeTimer = null; // Tracks the active timer ('study' or 'break')
 
-  const numberOfActiveProjects = UserData.generalData[2];
-  const numberOfActiveAssignments = UserData.generalData[3];
+// Toggle Start/Stop with Reset when Stopped
+function toggleTimer(buttonId) {
+    // Stop the active timer if switching between timers
+    if (activeTimer && activeTimer !== buttonId) {
+        stopTimer(activeTimer); // Stop and reset the previous timer
+    }
 
-  const numberOfCompletedProject = UserData.generalData[4];
-  const numberOfCompletedAssignments = UserData.generalData[5];
+    const button = document.getElementById(buttonId); // Get the button by ID
+    const label = button.querySelector('.label'); // Target the label for "Study" or "Break"
 
-  document.getElementById('UserName').innerHTML = userName;
-  document.getElementById('Status').innerHTML = status;
+    if (isRunning && activeTimer === buttonId) {
+        // Stop and Reset the timer if it's already running
+        stopTimer(buttonId);
+    } else {
+        // Start the timer
+        startTime = Date.now() - elapsedTime; // Adjust for paused time
+        timer = setInterval(function () {
+            elapsedTime = Date.now() - startTime; // Calculate elapsed time
+            updateDisplay(buttonId); // Update the display
+        }, 1000); // Update every 1 second
+        isRunning = true; // Update state
+        activeTimer = buttonId; // Mark this timer as active
 
-  // yyyy-mm-dd
-  const today = new Date();
-  const targetDate = new Date("2024-12-31");
-  if(today.getMonth()+1>6)
-  var season;
-    else
-    season = "Christmas";
-
-    season = "Summer"
-  const difference = Math.ceil((targetDate - today)/86400000);
-  document.getElementById('DaysForBreak').innerHTML = difference;
-
-  document.getElementById('nextBreak').innerHTML = season;
-
-  document.getElementById('activeProjects').innerHTML = numberOfActiveProjects;
-
-  document.getElementById('numberOfAssignments').innerHTML = numberOfActiveAssignments;
-
-  document.getElementById('completedAssignments').innerHTML = numberOfCompletedAssignments;
-
-  document.getElementById('completedProjects').innerHTML = numberOfCompletedProject;
-
-  document.getElementById("grindTime").innerHTML = StudyHours;
-
-  document.getElementById("chillTime").innerHTML = chillHours;
-  
-  document.getElementById("grindScore").innerHTML = ((StudyHours*10.25)-(chillHours*0.427)).toFixed(2);
-
-  sleepChart.data.datasets[0].data = UserData.sleepData;
-
-  sleepChart.update();
+        // Update button design and text
+        label.innerText = 'Stop'; // Change label to Stop
+        button.classList.remove('btn-success'); // Remove green style
+        button.classList.add('btn-danger'); // Add red style
+    }
 }
+
+// Stop Timer and Reset
+function stopTimer(buttonId) {
+    clearInterval(timer); // Stop the timer
+    timer = null; // Clear the timer reference
+    isRunning = false; // Update state
+    elapsedTime = 0; // Reset elapsed time
+    activeTimer = null; // Clear the active timer
+
+    // Reset the button
+    const button = document.getElementById(buttonId);
+    const label = button.querySelector('.label'); // Target the label
+
+    if (buttonId === 'startStudy') {
+        label.innerText = 'Study'; // Reset text for Study
+        button.classList.remove('btn-danger'); // Remove red style
+        button.classList.add('btn-success'); // Add green style
+    } else {
+        label.innerText = 'Break'; // Reset text for Break
+        button.classList.remove('btn-danger'); // Remove red style
+        button.classList.add('btn-danger'); // Add green style
+    }
+
+    updateDisplay(buttonId); // Reset display
+}
+
+// Update Timer Display (Only Updates Time!)
+function updateDisplay(buttonId) {
+    const button = document.getElementById(buttonId);
+    const timeDisplay = button.querySelector('.time'); // Target time span inside the button
+    timeDisplay.innerText = formatTime(elapsedTime); // Update only time, not label
+}
+
+// Format Time as HH:MM:SS
+function formatTime(ms) {
+    const hours = Math.floor(ms / 3600000); // Convert to hours
+    const minutes = Math.floor((ms % 3600000) / 60000); // Remaining minutes
+    const seconds = Math.floor((ms % 60000) / 1000); // Remaining seconds
+
+    return `${padNumber(hours)}:${padNumber(minutes)}:${padNumber(seconds)}`;
+}
+
+// Pad Numbers with Leading Zeros
+function padNumber(number, length = 2) {
+    return String(number).padStart(length, '0'); // Pad number with leading zeros
+}
+
+// Attach Event Listener for Buttons
+document.getElementById('startStudy').addEventListener('click', () => toggleTimer('startStudy'));
+document.getElementById('startBreak').addEventListener('click', () => toggleTimer('startBreak'));

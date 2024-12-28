@@ -5,6 +5,7 @@ const sleepHoursBtn = document.getElementById('sleepHoursBtn');
 const submitNumber = document.getElementById('submitNumber');
 const numberInput = document.getElementById('numberInput');
 const errorMessage = document.getElementById('errorMessage');
+const addGrades = document.getElementById('addGradesBtn');
 const numberInputModal = new bootstrap.Modal(document.getElementById('numberInputModal'));
 
 // Track which button was clicked
@@ -28,6 +29,13 @@ sleepHoursBtn.addEventListener('click', () =>{
     document.getElementById('numberInputModalLabel').textContent = 'Enter Sleep hours';
     numberInputModal.show(); // Open modal
     
+});
+
+addGrades.addEventListener('click', () =>{
+  currentAction = 'addGrades';
+  document.getElementById('numberInputModalLabel').textContent = 'Enter Grade';
+  numberInputModal.show(); // Open modal
+  
 });
 
 // Handle submit button click
@@ -56,6 +64,10 @@ submitNumber.addEventListener('click', async () => {
     else if(currentAction ==='sleepHours'){
         alert(`Sleep Hours Entered: ${number}`); 
         await writeSleep(number);   
+    }
+    else if(currentAction ==='addGrades'){
+      alert(`Sleep Hours Entered: ${number}`); 
+        await writeGrade(number);
     }
 
     // Close modal and clear inputs
