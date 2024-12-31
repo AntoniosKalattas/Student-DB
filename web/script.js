@@ -104,10 +104,10 @@ const showAsideBtn = $('.show-side-btn')
 const sidebar = $('.sidebar')
 const wrapper = $('#wrapper')
 
-//showAsideBtn.addEventListener('click', function () {
-//  $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
-//  wrapper.classList.toggle('fullwidth')
-//})
+showAsideBtn.addEventListener('click', function () {
+  $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
+  wrapper.classList.toggle('fullwidth')
+})
 
 if (window.innerWidth < 767) {
   sidebar.classList.add('show-sidebar');
@@ -423,12 +423,14 @@ function increaseAssignments(){
 
 function decreaseAssignments(){
   UserData.generalData[0] = Number(UserData.generalData[0]);
-  UserData.generalData[0]--;
-  document.getElementById('numberOfAssignments').innerHTML = UserData.generalData[0];
-  UserData.generalData[2] = Number(UserData.generalData[2]);
-  UserData.generalData[2]++;
-  document.getElementById('completedAssignments').innerHTML = UserData.generalData[2];
-  wrtieActiveAndComplete();
+  if(UserData.generalData[0]>0){
+    UserData.generalData[0]--;
+    document.getElementById('numberOfAssignments').innerHTML = UserData.generalData[0];
+    UserData.generalData[2] = Number(UserData.generalData[2]);
+    UserData.generalData[2]++;
+    document.getElementById('completedAssignments').innerHTML = UserData.generalData[2];
+    wrtieActiveAndComplete();
+  }
 }
 
 function increaseProjects(){
@@ -440,19 +442,18 @@ function increaseProjects(){
 
 function decreaseProjects(){
   UserData.generalData[1] = Number(UserData.generalData[1]);
-  UserData.generalData[1]--;
-  document.getElementById('activeProjects').innerHTML = UserData.generalData[1];
-  UserData.generalData[3] = Number(UserData.generalData[3]);
-  UserData.generalData[3]++;
-  document.getElementById('completedProjects').innerHTML = UserData.generalData[3];
-  wrtieActiveAndComplete();
-
+  if(UserData.generalData[1]>0){
+    UserData.generalData[1]--;
+    document.getElementById('activeProjects').innerHTML = UserData.generalData[1];
+    UserData.generalData[3] = Number(UserData.generalData[3]);
+    UserData.generalData[3]++;
+    document.getElementById('completedProjects').innerHTML = UserData.generalData[3];
+    wrtieActiveAndComplete();
+  }
 }
-
 
 // Initialize the page
 fillPageFirstTime();
-
 
 // Timer Variables
 let timer;
