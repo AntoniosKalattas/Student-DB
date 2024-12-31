@@ -47,7 +47,7 @@ All these are wrapped into a user-friendly interface with modals, charts, and dy
    - A built-in countdown for **Days Until Next Break**.
 
 6. **Responsive Sidebar Navigation**  
-   - A collapsible sidebar with categories (Health, Grind, Goals).  
+   - A collapsible sidebar with categories (Health, Grind).  
    - Mobile-friendly menu toggles.
 
 7. **Bootstrap Integration**  
@@ -101,7 +101,6 @@ All these are wrapped into a user-friendly interface with modals, charts, and dy
 2. **Navigating the Sidebar**:  
    - **Health**: View or log sleep hours.  
    - **Grind**: Track study hours, add break hours.  
-   - **Goals**: (Future development) A placeholder for personal or academic goals.  
    - **Add Grades**: Opens a modal to input grades which appear in the **Grade performance** chart.
 
 3. **Using Timers**:  
