@@ -4,8 +4,10 @@ let UserData = {};
 
 let sleepChart;
 let gradesChart;
+let grindChart;
 
 async function runProcess(executable, args) {
+  console.log(args[1]);
   return new Promise((resolve, reject) => {
     let output = '';
 
@@ -38,23 +40,21 @@ async function runProcess(executable, args) {
 async function readData(option) {
     await runProcess('gcc', ['./BackEnd/readWriteData.c', '-o', './BackEnd/readWriteData']);                    // Compile C code.
     if(option==2 || option ==3)
-      UserData.generalData= catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/data.txt', '1']));  // Execute C code
+      UserData.generalData= catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/data.txt', 'rActiveAndComplete']));  // Execute C code
 
       // Read Sleep.
     if(option ==1 || option ==2)
       UserData.sleepData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', 'rSleep']));                 // Execute C code
     if(option ==3 || option ==2)
         UserData.grades = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/gradesData.txt', 'rGrades']));        
+    if(option == 4 || option ==2)
+      UserData.grindData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/grindData.txt', 'rGrind']));
+    if(option == 5 || option ==2)
+      UserData.chillData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/chillData.txt', 'rChill']));
+    console.log(UserData.sleepData);
     return UserData;
 }
 
-async function writeData(){
-  await runProcess('./BackEnd/readWriteData', ['./BackEnd/data1.txt',UserData.generalData[0], UserData.generalData[1], UserData.generalData[2], UserData.generalData[3], UserData.generalData[4],UserData.generalData[5],'0']);                 // Execute C code  
-}
-
-async function writeSleep(sleepHours){
-  await runProcess('./BackEnd/readWriteData', ['./BackEnd/sleepData.txt', sleepHours, "wSleep"]);
-}
 function catString(output){
     let values =[];
     let charr = '';
@@ -71,9 +71,15 @@ function catString(output){
   return values;
 }
 
-async function writeGrade(grade){
-  await runProcess('./BackEnd/readWriteData', ['./BackEnd/gradesData.txt', grade, "wGrade"]);
+
+async function wrtieActiveAndComplete(){
+  await runProcess('./BackEnd/readWriteData', ['./BackEnd/data.txt',UserData.generalData[0], UserData.generalData[1], UserData.generalData[2],UserData.generalData[3],'wActiveAndComplete']);                 // Execute C code  
 }
+
+async function writeBack(path,value, option){
+  await runProcess('./BackEnd/readWriteData', ['./BackEnd/'+path, value, option]);
+}
+
 
 function $(selector) {
   return document.querySelector(selector)
@@ -185,69 +191,8 @@ Chart.defaults.scale.ticks.padding = 10
 Chart.defaults.global.elements.point.radius = 0
 
 // Responsivess
-Chart.defaults.global.responsive = true
+Chart.defaults.global.responsive = true;
 Chart.defaults.global.maintainAspectRatio = false
-
-
-
-
-
-
-var grindChart = document.getElementById('grindChart');
-var myChart = new Chart(grindChart, {
-  type: 'line',
-  data: {
-    labels: ["January", "February", "March", "April", 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-    datasets: [{
-      label: "Lost",
-      lineTension: 0.2,
-      borderColor: '#d9534f',
-      borderWidth: 1.5,
-      showLine: true,
-      data: [3, 30, 16, 30, 16, 36, 21, 40, 20, 30],
-      backgroundColor: 'transparent'
-    }, {
-      label: "Lost",
-      lineTension: 0.2,
-      borderColor: '#5cb85c',
-      borderWidth: 1.5,
-      data: [6, 20, 5, 20, 5, 25, 9, 18, 20, 15],
-      backgroundColor: 'transparent'
-    },{
-      label: "Lost",
-      lineTension: 0.2,
-      borderColor: '#f0ad4e',
-      borderWidth: 1.5,
-      data: [12, 20, 15, 20, 5, 35, 10, 15, 35, 25],
-      backgroundColor: 'transparent'
-    },{
-      label: "Lost",
-      lineTension: 0.2,
-      borderColor: '#337ab7',
-      borderWidth: 1.5,
-      data: [16, 25, 10, 25, 10, 30, 14, 23, 14, 29],
-      backgroundColor: 'transparent'
-    }]
-  },
-  options: {
-    scales: {
-      yAxes: [{
-        gridLines: {
-          drawBorder: false
-        },
-        ticks: {
-          stepSize: 12
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          display: false,
-        },
-      }],
-    }
-  }
-})
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /**     File Format
@@ -279,7 +224,7 @@ function getSeason() {
 
 // Function to calculate grind score
 function calculateGrindScore(studyHours, chillHours) {
-  return ((studyHours * 10.25) - (chillHours * 0.427)).toFixed(2);
+  return (((studyHours/1000) * 1.25) - ((chillHours/1000) * 0.0427)).toFixed(2);
 }
 
 // Function to create grades Chart.
@@ -319,7 +264,7 @@ function createGradesChart(data){
 }
 
 
-// Function to create sleep chart
+// Function to create sleep Chart.
 function createSleepChart(data) {
   return new Chart(document.getElementById('SleepChart'), {
     type: 'bar',
@@ -349,17 +294,71 @@ function createSleepChart(data) {
     }
   });
 }
+// Function to create the grind Chart.
+function createGrindChart(sleepData, grindData, chillData){
+  console.log(sleepData,grindData, chillData);
+  const grindHours = grindData.map(getHours);
+  const chillHours = chillData.map(getHours);
+  return new Chart(document.getElementById('grindChart'),{
+    type: 'line',
+    data: {
+      labels: ["January", "February", "March", "April", 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      datasets: [{
+        label: "Sleep",
+        lineTension: 0.2,
+        borderColor: '#ffff00',
+        borderWidth: 1.5,
+        showLine: true,
+        data: sleepData,
+      }, {
+        label: "Grind",
+        lineTension: 0.2,
+        borderColor: '#1e90ff',
+        borderWidth: 1.5,
+        data: grindHours,
+      },{
+        label: "Break",
+        lineTension: 0.2,
+        borderColor: '#ff0000',
+        borderWidth: 1.5,
+        data: chillHours,
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false
+          },
+          ticks: {
+            stepSize: 2
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            display: false,
+          },
+        }],
+      }
+    }
+  })
+}
 
 // Common function to populate the page
 async function populatePage(userData) {
   const userName = "Antonios Kalattas";
   const status = "UCY student";
 
+  const currentMonth = new Date().getMonth();
+  console.log(currentMonth);
   const generalData = userData.generalData;
-  const studyHours = generalData[0];
-  const chillHours = generalData[1];
+  const studyHours = userData.grindData[currentMonth];
+  const chillHours = userData.chillData[currentMonth];
+  console.log(studyHours);
+  console.log(chillHours);
 
-  const targetDate = new Date("2024-12-31");
+
+  const targetDate = new Date("2025-5-15");
   const daysForBreak = calculateDaysUntil(targetDate);
   const season = getSeason();
 
@@ -370,44 +369,86 @@ async function populatePage(userData) {
   updateElement('nextBreak', season);
 
   // Update project and assignment data
-  updateElement('activeProjects', generalData[2]);
-  updateElement('numberOfAssignments', generalData[3]);
-  updateElement('completedProjects', generalData[4]);
-  updateElement('completedAssignments', generalData[5]);
+  updateElement('numberOfAssignments', generalData[0]);
+  updateElement('activeProjects', generalData[1]);
+  updateElement('completedAssignments', generalData[2]);
+  updateElement('completedProjects', generalData[3]);
 
   // Update grind data
-  updateElement("grindTime", studyHours);
-  updateElement("chillTime", chillHours);
+  updateElement("grindTime", formatTime(studyHours));
+  updateElement("chillTime", formatTime(chillHours));
   updateElement("grindScore", calculateGrindScore(studyHours, chillHours));
 
-  return userData.sleepData;
 }
 
 // Fill page the first time
 async function fillPageFirstTime() {
   const userData = await readData(2);
-  const sleepData = await populatePage(userData);
+  await populatePage(userData);
 
   // Create the sleep chart
-  sleepChart = createSleepChart(sleepData);
+  sleepChart =  createSleepChart(UserData.sleepData);
   gradesChart = createGradesChart(UserData.grades);
+  grindChart =  createGrindChart(UserData.sleepData, UserData.grindData, UserData.chillData);
 }
 
-// Refresh the page with updated data
+// Refresh the page with updated data --- Most of the times its better to manually change the html because its very expensive function.
 async function refreshPage() {
   const userData = await readData(2);
-  const sleepData = await populatePage(userData);
+  await populatePage(userData);
 
 
   // Update the sleep chart
-  sleepChart.data.datasets[0].data = sleepData;
-  sleepChart.data.datasets[0].backgroundColor = sleepData.map(value => value < 8 ? "red" : "green");
+  sleepChart.data.datasets[0].data = UserData.sleepData;
+  sleepChart.data.datasets[0].backgroundColor = UserData.sleepData.map(value => value < 8 ? "red" : "green");
   sleepChart.update();
+
   // Update teh grades Chart.
-  console.log(UserData.grades);
   gradesChart.data.datasets[0].data = UserData.grades.map(Number); // Ensure grades are numeric
-  gradesChart.update(); // Refresh the chart
+  gradesChart.update();                                            // Refresh the chart
+
+  // Update the grindChart.
+  grindChart.data.datasets[0].data = userData.sleepData;
+  grindChart.data.datasets[1].data = userData.grindData.map(getHours);
+  grindChart.data.datasets[2].data = userData.chillData.map(getHours);
+  grindChart.update();
 }
+
+function increaseAssignments(){
+  UserData.generalData[0] = Number(UserData.generalData[0]);
+  UserData.generalData[0]++;
+  document.getElementById('numberOfAssignments').innerHTML = UserData.generalData[0];
+  wrtieActiveAndComplete();
+}
+
+function decreaseAssignments(){
+  UserData.generalData[0] = Number(UserData.generalData[0]);
+  UserData.generalData[0]--;
+  document.getElementById('numberOfAssignments').innerHTML = UserData.generalData[0];
+  UserData.generalData[2] = Number(UserData.generalData[2]);
+  UserData.generalData[2]++;
+  document.getElementById('completedAssignments').innerHTML = UserData.generalData[2];
+  wrtieActiveAndComplete();
+}
+
+function increaseProjects(){
+  UserData.generalData[1] = Number(UserData.generalData[1]);
+  UserData.generalData[1]++;
+  document.getElementById('activeProjects').innerHTML = UserData.generalData[1];
+  wrtieActiveAndComplete();
+}
+
+function decreaseProjects(){
+  UserData.generalData[1] = Number(UserData.generalData[1]);
+  UserData.generalData[1]--;
+  document.getElementById('activeProjects').innerHTML = UserData.generalData[1];
+  UserData.generalData[3] = Number(UserData.generalData[3]);
+  UserData.generalData[3]++;
+  document.getElementById('completedProjects').innerHTML = UserData.generalData[3];
+  wrtieActiveAndComplete();
+
+}
+
 
 // Initialize the page
 fillPageFirstTime();
@@ -416,84 +457,104 @@ fillPageFirstTime();
 // Timer Variables
 let timer;
 let startTime;
-let elapsedTime = 0; // Tracks elapsed time in milliseconds
-let isRunning = false; // State to track if the timer is running
-let activeTimer = null; // Tracks the active timer ('study' or 'break')
+let elapsedTime = 0;      // Tracks elapsed time in milliseconds
+let isRunning = false;    // State to track if the timer is running
+let activeTimer = null;   // Tracks the active timer ('study' or 'break')
 
 // Toggle Start/Stop with Reset when Stopped
 function toggleTimer(buttonId) {
     // Stop the active timer if switching between timers
     if (activeTimer && activeTimer !== buttonId) {
-        stopTimer(activeTimer); // Stop and reset the previous timer
+        stopTimer(activeTimer);                         // Stop and reset the previous timer
     }
 
-    const button = document.getElementById(buttonId); // Get the button by ID
-    const label = button.querySelector('.label'); // Target the label for "Study" or "Break"
+    const button = document.getElementById(buttonId);   // Get the button by ID
+    const label = button.querySelector('.label');       // Target the label for "Study" or "Break"
 
     if (isRunning && activeTimer === buttonId) {
-        // Stop and Reset the timer if it's already running
+        // Stop and Reset the timer if already running
         stopTimer(buttonId);
     } else {
-        // Start the timer
-        startTime = Date.now() - elapsedTime; // Adjust for paused time
+        // Start timer
+        startTime = Date.now() - elapsedTime;     // Adjust for paused time
         timer = setInterval(function () {
             elapsedTime = Date.now() - startTime; // Calculate elapsed time
-            updateDisplay(buttonId); // Update the display
-        }, 1000); // Update every 1 second
-        isRunning = true; // Update state
-        activeTimer = buttonId; // Mark this timer as active
+            updateDisplay(buttonId);              // Update the display
+        }, 1000);                                 // Update only every 1 second
+        isRunning = true;                         // Update state
+        activeTimer = buttonId;                   // Mark this timer as active
 
         // Update button design and text
-        label.innerText = 'Stop'; // Change label to Stop
-        button.classList.remove('btn-success'); // Remove green style
-        button.classList.add('btn-danger'); // Add red style
+        label.innerText = 'Stop';                 // Change label to Stop
+        button.classList.remove('btn-success');   // Remove green style
+        button.classList.add('btn-danger');       // Add red style
     }
 }
 
 // Stop Timer and Reset
-function stopTimer(buttonId) {
-    clearInterval(timer); // Stop the timer
-    timer = null; // Clear the timer reference
-    isRunning = false; // Update state
-    elapsedTime = 0; // Reset elapsed time
-    activeTimer = null; // Clear the active timer
+async function stopTimer(buttonId) {
+    const currentMonth = new Date().getMonth();   // get the current month.
+    clearInterval(timer);                         // Stop the timer
+    if(buttonId ==='startStudy'){
+        console.log(elapsedTime);
+        UserData.grindData[currentMonth] = Number(UserData.grindData[currentMonth]);      
+        UserData.grindData[currentMonth] += Number(elapsedTime);   // save it to the study hours.
+        writeBack("grindData.txt", UserData.grindData[currentMonth], "wGrind");
+        document.getElementById('grindTime').innerHTML =formatTime(UserData.grindData[currentMonth]);
+    }
+    else{
+      console.log(elapsedTime);
+      UserData.chillData[currentMonth] = Number(UserData.chillData[currentMonth]);      
+      UserData.chillData[currentMonth] += Number(elapsedTime);     // save it to the chill hours.
+      writeBack("chillData.txt", UserData.chillData[currentMonth], "wChill");
+      document.getElementById('chillTime').innerHTML = formatTime(UserData.chillData[currentMonth]);
+    }
+    updateElement("grindScore", calculateGrindScore(UserData.grindData[currentMonth], UserData.chillData[currentMonth]));
+    timer = null;                                 // Clear the timer reference
+    isRunning = false;                            // Update state
+    elapsedTime = 0;                              // Reset elapsed time
+    activeTimer = null;                           // Clear the active timer
 
     // Reset the button
     const button = document.getElementById(buttonId);
     const label = button.querySelector('.label'); // Target the label
 
     if (buttonId === 'startStudy') {
-        label.innerText = 'Study'; // Reset text for Study
-        button.classList.remove('btn-danger'); // Remove red style
-        button.classList.add('btn-success'); // Add green style
+        label.innerText = 'Study';                // Reset text for Study
+        button.classList.remove('btn-danger');    // Remove red style
+        button.classList.add('btn-success');      // Add green style
     } else {
-        label.innerText = 'Break'; // Reset text for Break
-        button.classList.remove('btn-danger'); // Remove red style
-        button.classList.add('btn-danger'); // Add green style
+        label.innerText = 'Break';                // Reset text for Break
+        button.classList.remove('btn-danger');    // Remove red style
+        button.classList.add('btn-danger');       // Add green style
     }
 
-    updateDisplay(buttonId); // Reset display
+    updateDisplay(buttonId);                      // Reset display
 }
 
-// Update Timer Display (Only Updates Time!)
+// Update Timer Display
 function updateDisplay(buttonId) {
     const button = document.getElementById(buttonId);
-    const timeDisplay = button.querySelector('.time'); // Target time span inside the button
-    timeDisplay.innerText = formatTime(elapsedTime); // Update only time, not label
+    const timeDisplay = button.querySelector('.time');  // Target time span inside the button
+    timeDisplay.innerText = formatTime(elapsedTime);    // Update only time, not label
 }
 
 // Format Time as HH:MM:SS
 function formatTime(ms) {
-    const hours = Math.floor(ms / 3600000); // Convert to hours
-    const minutes = Math.floor((ms % 3600000) / 60000); // Remaining minutes
-    const seconds = Math.floor((ms % 60000) / 1000); // Remaining seconds
+  const hours = Math.floor(ms / 3600000);             // Convert to hours
+  const minutes = Math.floor((ms % 3600000) / 60000); // Remaining minutes
+  const seconds = Math.floor((ms % 60000) / 1000);    // Remaining seconds
 
-    return `${padNumber(hours)}:${padNumber(minutes)}:${padNumber(seconds)}`;
+  return `${padNumber(hours)}:${padNumber(minutes)}:${padNumber(seconds)}`;
+}
+function getHours(ms){
+  return Math.floor(ms / 3600000);                    // return hours
+    
 }
 
 // Pad Numbers with Leading Zeros
 function padNumber(number, length = 2) {
-    return String(number).padStart(length, '0'); // Pad number with leading zeros
+    return String(number).padStart(length, '0');        // Pad number with leading zeros
 }
 
 // Attach Event Listener for Buttons

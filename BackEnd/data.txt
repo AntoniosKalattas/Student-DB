@@ -1,7 +1,4 @@
-23 :  study hours.
-12 :  chill hours.
-12 :  active projects.
-8  :  active assignments.
-34 :  completed projects.
-2  :  completed assignments.
-12 :  next break
+12 : 
+23 : 
+29 : 
+20 : 

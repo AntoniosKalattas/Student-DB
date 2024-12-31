@@ -63,11 +63,11 @@ submitNumber.addEventListener('click', async () => {
     }
     else if(currentAction ==='sleepHours'){
         alert(`Sleep Hours Entered: ${number}`); 
-        await writeSleep(number);   
+        await writeBack("sleepData.txt",number, "wSleep");   
     }
     else if(currentAction ==='addGrades'){
       alert(`Sleep Hours Entered: ${number}`); 
-        await writeGrade(number);
+        await writeBack("gradesData.txt",number, "wGrade");
     }
 
     // Close modal and clear inputs

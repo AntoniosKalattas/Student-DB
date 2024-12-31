@@ -97,39 +97,84 @@ void writeAvgData(char **argv){
     fclose(fp);
 }
 
+// Used to clean old months that are now being overwritten.
+//void clearOldMonth(char *fileName){
+//    time_t t = time(NULL);
+//    struct tm *tm_info = localtime(&t);
+//    int month = tm_info->tm_mon; 
+//
+//    FILE *fp = fopen(argv[1],"r");
+//    if(fp==NULL){
+//        printf("Faild to locate file");
+//        return;
+//    }
+//    char line[100];             //sotre the input line;
+//    while(fgets(line, sizeof(line),fp)){
+//        int value_t;
+//        int month_t;
+//        if(sscanf(line,"%f - %d",&value_t, &month_t)==2){
+//            ;
+//        }
+//    }
+//}
+
+void calculateSum(char **argv){
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+    int month = tm_info->tm_mon;    
+
+    FILE *fp = fopen(argv[1],"r");
+    if(fp==NULL){
+        printf("Faild to locate file");
+        return;
+    }
+    char line[100];             //sotre the input line;
+    float value = 0;              // used to calculate the avg. Total Value.
+    while(fgets(line, sizeof(line),fp)){
+        float value_t;
+        int month_t;
+        if(sscanf(line,"%f - %d",&value_t, &month_t)==2){
+            if(month_t==month){
+                value+=value_t;
+            }
+        }
+
+    }
+    fclose(fp);
+    printf("%.1f",value);
+}
+
 int main(int argc, char* argv[]){
     /**     File Format
      * 
-     * 1) total study hours.
-     * 2) chill hours.
-     * 3) sleep hours.
-     * 4) active assignments.
-     * 5) active projects.
-     * 6) completed assignments.
-     * 7) completed projects.
-     * 8) next break.
+     * 1) active assignments.
+     * 2) active projects.
+     * 3) completed assignments.
+     * 4) completed projects.
+     * 5) next break.
      */
 
-    //if(argc !=3){
-    //    perror("Wrong number of arguments");
-    //    return EXIT_FAILURE;
-    //}
-    if(strcmp(argv[argc-1],"0")==0)                     // wrtie grind chill etc.
+    if(strcmp(argv[argc-1],"wActiveAndComplete")==0)                     // wrtie grind chill etc.
         writeData(argc,argv);   
-    else if(strcmp(argv[argc-1],"1")==0)                // read grind, chill etc.
+    else if(strcmp(argv[argc-1],"rActiveAndComplete")==0)                // read grind, chill etc.
         readData(argv[1]);
 
 
-    else if(strcmp(argv[argc-1],"rSleep")==0){          // read sleep data
-        printf("rSleep");
+    else if(strcmp(argv[argc-1],"rSleep")==0)           // read sleep data
         readAvgData(argc,argv);
-    }
     else if(strcmp(argv[argc-1],"wSleep")==0)           // write sleep.
         writeAvgData(argv);
-
-    else if(strcmp(argv[argc-1],"rGrades")==0)           // read grades.
+    else if(strcmp(argv[argc-1],"rGrades")==0)          // read grades.
         readAvgData(argc,argv);
     else if(strcmp(argv[argc-1],"wGrade")==0)           // write grade.
+        writeAvgData(argv);
+    else if(strcmp(argv[argc-1],"rGrind")==0)           // read grindData.
+        readAvgData(argc,argv);
+    else if(strcmp(argv[argc-1],"wGrind")==0)           // write grindData.
+        writeAvgData(argv);
+    else if(strcmp(argv[argc-1],"rChill")==0)           // read ChillData.
+        readAvgData(argc,argv);
+    else if(strcmp(argv[argc-1],"wChill")==0)           // write chillData.
         writeAvgData(argv);
     else
         printf("Invalid Arguments");
