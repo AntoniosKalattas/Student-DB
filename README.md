@@ -61,7 +61,7 @@ All these are wrapped into a user-friendly interface with modals, charts, and dy
 ## Screenshots
 
 
-<img src="https://github.com/AntoniosKalattas/ST-Dashboard/blob/main/img/Screenshot%202024-12-31%20at%207.53.44%E2%80%AFPM.png" width="400"/> 
+![alt text]("https://github.com/AntoniosKalattas/ST-Dashboard/blob/main/img/Screenshot%202024-12-31%20at%207.53.44%E2%80%AFPM.png")
 
 ---
 
