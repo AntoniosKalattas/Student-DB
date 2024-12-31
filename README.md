@@ -61,8 +61,8 @@ All these are wrapped into a user-friendly interface with modals, charts, and dy
 ## Screenshots
 
 | **Sidebar & Main Dashboard** | **Charts Section** |
-|-----------------------------|---------------------|
-| <img src="https://user-images/your-sidebar-screenshot.png" width="400"/> | <img src="https://user-images/your-charts-screenshot.png" width="400"/> |
+|-----------------------------|
+| <img src="https://github.com/AntoniosKalattas/ST-Dashboard/blob/main/img/Screenshot%202024-12-31%20at%207.53.44%E2%80%AFPM.png" width="400"/> |
 
 *(Replace placeholder images with actual screenshots from your app.)*
 
@@ -171,4 +171,3 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 ### Thank You!
 Thank you for checking out **ST-Dashboard**. If you have any questions or suggestions, feel free to open an issue or submit a pull request! 
 
-> **Note**: Be sure to update any URLs, file paths, or references to reflect your actual repository and usage. Add screenshots or GIFs to help users quickly understand your UI and features.
