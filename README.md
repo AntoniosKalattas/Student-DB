@@ -1,7 +1,7 @@
 # ST-Dashboard
 
 A sleek and interactive **Student Dashboard** built with **Electron**, **Bootstrap**, and **Chart.js**. This dashboard helps students keep track of their study habits, break hours, assignments, projects, sleep data, and more.
-
+#### Still Under Development 
 ## Table of Contents
 1. [Overview](#overview)  
 2. [Features](#features)  
