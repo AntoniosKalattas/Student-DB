@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<time.h>
+#include<stdbool.h>
 
 #define sleepData "sleepData.txt"
 #define generalData "data.txt"
@@ -128,8 +129,8 @@ void calculateSum(char **argv){
         printf("Faild to locate file");
         return;
     }
-    char line[100];             //sotre the input line;
-    float value = 0;              // used to calculate the avg. Total Value.
+    char line[100];                 //sotre the input line;
+    float value = 0;                // used to calculate the avg. Total Value.
     while(fgets(line, sizeof(line),fp)){
         float value_t;
         int month_t;
@@ -142,6 +143,38 @@ void calculateSum(char **argv){
     }
     fclose(fp);
     printf("%.1f",value);
+}
+
+void montlyValue(char **argv){
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+    int month = tm_info->tm_mon;            // get current month.
+
+    FILE *fp = fopen(argv[1],"r");
+    if(fp==NULL){
+        printf("Faild to locate file");
+        return;
+    }
+    char line[100];                         //sotre the input line;
+    int value = 0;                        // used to calculate the avg. Total Value.
+    bool exist=false;
+    while(fgets(line, sizeof(line),fp)){
+        int value_t;
+        int month_t;
+        if(sscanf(line,"%d - %d",&value_t, &month_t)==2){
+            if(month_t!=month)
+                exist=false;
+            if(month_t==month){
+                    if(exist==false)
+                        value=0;
+                value+=value_t;
+                exist=true;
+            }
+
+        }
+    }
+    fclose(fp);
+    printf("%d", value);
 }
 
 int main(int argc, char* argv[]){
@@ -176,6 +209,14 @@ int main(int argc, char* argv[]){
         readAvgData(argc,argv);
     else if(strcmp(argv[argc-1],"wChill")==0)           // write chillData.
         writeAvgData(argv);
+
+    else if(strcmp(argv[argc-1],"monthlyGrind")==0){           // read total monthly Grind.
+        montlyValue(argv);
+    }
+    else if(strcmp(argv[argc-1],"monthlyChill")==0){           // read total monthly chill.
+        montlyValue(argv);
+    }
+    
     else
         printf("Invalid Arguments");
 

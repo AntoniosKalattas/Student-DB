@@ -51,6 +51,10 @@ async function readData(option) {
       UserData.grindData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/grindData.txt', 'rGrind']));
     if(option == 5 || option ==2)
       UserData.chillData = catString(await runProcess('./BackEnd/readWriteData', ['./BackEnd/chillData.txt', 'rChill']));
+    if(option == 6 || option ==2)
+      UserData.monthlyGrind = (await runProcess('./BackEnd/readWriteData', ['./BackEnd/grindData.txt', 'monthlyGrind']));
+    if(option == 7 || option ==2)
+      UserData.monthlyChill = (await runProcess('./BackEnd/readWriteData', ['./BackEnd/chillData.txt', 'monthlyChill']));
     console.log(UserData.sleepData);
     return UserData;
 }
@@ -70,7 +74,6 @@ function catString(output){
   }
   return values;
 }
-
 
 async function wrtieActiveAndComplete(){
   await runProcess('./BackEnd/readWriteData', ['./BackEnd/data.txt',UserData.generalData[0], UserData.generalData[1], UserData.generalData[2],UserData.generalData[3],'wActiveAndComplete']);                 // Execute C code  
@@ -296,9 +299,11 @@ function createSleepChart(data) {
 }
 // Function to create the grind Chart.
 function createGrindChart(sleepData, grindData, chillData){
+  console.log("grind");
   console.log(sleepData,grindData, chillData);
   const grindHours = grindData.map(getHours);
   const chillHours = chillData.map(getHours);
+  console.log(grindHours, chillHours);
   return new Chart(document.getElementById('grindChart'),{
     type: 'line',
     data: {
@@ -352,8 +357,9 @@ async function populatePage(userData) {
   const currentMonth = new Date().getMonth();
   console.log(currentMonth);
   const generalData = userData.generalData;
-  const studyHours = userData.grindData[currentMonth];
-  const chillHours = userData.chillData[currentMonth];
+  const studyHours = userData.monthlyGrind;
+  const chillHours = userData.monthlyChill;
+  console.log("Study/Chill hours");
   console.log(studyHours);
   console.log(chillHours);
 
@@ -499,16 +505,20 @@ async function stopTimer(buttonId) {
     if(buttonId ==='startStudy'){
         console.log(elapsedTime);
         UserData.grindData[currentMonth] = Number(UserData.grindData[currentMonth]);      
-        UserData.grindData[currentMonth] += Number(elapsedTime);   // save it to the study hours.
+        UserData.grindData[currentMonth] = Number(elapsedTime);   // save it to the study hours.
         writeBack("grindData.txt", UserData.grindData[currentMonth], "wGrind");
-        document.getElementById('grindTime').innerHTML =formatTime(UserData.grindData[currentMonth]);
+        UserData.monthlyGrind = Number(UserData.monthlyGrind);      
+        UserData.monthlyGrind+=elapsedTime;
+        document.getElementById('grindTime').innerHTML =formatTime(UserData.monthlyGrind);
     }
     else{
       console.log(elapsedTime);
       UserData.chillData[currentMonth] = Number(UserData.chillData[currentMonth]);      
-      UserData.chillData[currentMonth] += Number(elapsedTime);     // save it to the chill hours.
+      UserData.chillData[currentMonth] = Number(elapsedTime);     // save it to the chill hours.
       writeBack("chillData.txt", UserData.chillData[currentMonth], "wChill");
-      document.getElementById('chillTime').innerHTML = formatTime(UserData.chillData[currentMonth]);
+      UserData.monthlyChill = Number(UserData.monthlyChill);      
+      UserData.monthlyChill+=elapsedTime;
+      document.getElementById('chillTime').innerHTML = formatTime(UserData.monthlyChill);
     }
     updateElement("grindScore", calculateGrindScore(UserData.grindData[currentMonth], UserData.chillData[currentMonth]));
     timer = null;                                 // Clear the timer reference
