@@ -219,7 +219,7 @@ function calculateDaysUntil(targetDate) {
 // Function to determine the season
 function getSeason() {
   const month = new Date().getMonth() + 1; // 1-based month
-  return month > 6 ? "Summer" : "Christmas";
+  return month > 6 ? "Christmas" : "Summer";
 }
 
 // Function to calculate grind score
