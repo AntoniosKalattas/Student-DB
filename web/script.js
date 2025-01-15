@@ -197,17 +197,6 @@ Chart.defaults.global.elements.point.radius = 0
 Chart.defaults.global.responsive = true;
 Chart.defaults.global.maintainAspectRatio = false
 
-///////////////////////////////////////////////////////////////////////////////
-/**     File Format
-    0 :  study hours.
-    1 :  chill hours.
-    2 :  active projects.
-    3 :  active assignments.
-    4 :  completed projects.
-    5 :  completed assignments.
-    6 :  next break
-*/
-
 // Reusable function to update DOM elements
 function updateElement(id, value) {
   document.getElementById(id).innerHTML = value;
@@ -299,11 +288,8 @@ function createSleepChart(data) {
 }
 // Function to create the grind Chart.
 function createGrindChart(sleepData, grindData, chillData){
-  console.log("grind");
-  console.log(sleepData,grindData, chillData);
-  const grindHours = grindData.map(getHours);
+  const grindHours =  grindData.map(getHours);
   const chillHours = chillData.map(getHours);
-  console.log(grindHours, chillHours);
   return new Chart(document.getElementById('grindChart'),{
     type: 'line',
     data: {
@@ -391,7 +377,9 @@ async function populatePage(userData) {
 async function fillPageFirstTime() {
   const userData = await readData(2);
   await populatePage(userData);
-
+  console.log("data to be used");
+  console.log(UserData.grindData);
+  console.log(UserData.chillData);
   // Create the sleep chart
   sleepChart =  createSleepChart(UserData.sleepData);
   gradesChart = createGradesChart(UserData.grades);
@@ -417,6 +405,9 @@ async function refreshPage() {
   grindChart.data.datasets[0].data = userData.sleepData;
   grindChart.data.datasets[1].data = userData.grindData.map(getHours);
   grindChart.data.datasets[2].data = userData.chillData.map(getHours);
+  console.log(grindChart.data.datasets[0].data);
+  console.log(grindChart.data.datasets[1].data);
+  console.log(grindChart.data.datasets[2].data);
   grindChart.update();
 }
 
@@ -541,6 +532,7 @@ async function stopTimer(buttonId) {
     }
 
     updateDisplay(buttonId);                      // Reset display
+
 }
 
 // Update Timer Display
@@ -558,10 +550,15 @@ function formatTime(ms) {
 
   return `${padNumber(hours)}:${padNumber(minutes)}:${padNumber(seconds)}`;
 }
-function getHours(ms){
-  return Math.floor(ms / 3600000);                    // return hours
-    
+function getHours(ms) {
+  ms = Number(ms);      // Convert to number.
+  if (isNaN(ms)) {
+    console.error("Invalid input for getHours:", ms);
+    return 0;
+  }
+  return ms / 3600000; // Convert ms to hours
 }
+
 
 // Pad Numbers with Leading Zeros
 function padNumber(number, length = 2) {

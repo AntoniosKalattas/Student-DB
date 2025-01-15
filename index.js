@@ -2,12 +2,16 @@ const { app, BrowserWindow } = require('electron/main');
 const path = require('node:path');
 const { spawn } = require('child_process'); 
 
+
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 1400,
     height: 900,
     //icon: path.join(__dirname, 'assets', 'app-icon.png'), 
     webPreferences: {
+        webSecurity: true,
+        nodeIntegration: false,
+        contextIsolation: true,
         preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: true,
         contextIsolation: false
@@ -28,8 +32,10 @@ app.whenReady().then(() => {
   })
 })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on('window-all-closed',()=>{
+  if(process.platform !== 'darwin'){
+    if(activeTimer)
+      stopTimer(activeTimer); 
     app.quit()
   }
 })
